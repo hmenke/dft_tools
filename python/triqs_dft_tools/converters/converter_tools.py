@@ -30,7 +30,7 @@ class ConverterTools:
     def __init__(self):
         pass
 
-    def read_fortran_file(self, filename, to_replace):
+    def read_fortran_file(self, filename, to_replace, comment_characters=['!']):
         """
         Returns a generator that yields all numbers in the Fortran file as float, with possible replacements.
 
@@ -40,6 +40,8 @@ class ConverterTools:
                    Name of Fortran-produced file.
         to_replace : dict of str:str
                      Dictionary defining old_char:new_char.
+        comment_characters : list of str
+                             List of characters to treat as initiator of comments
 
         Returns
         -------
@@ -52,6 +54,9 @@ class ConverterTools:
         if not(os.path.exists(filename)):
             raise IOError("File %s does not exist." % filename)
         for line in open(filename, 'r'):
+            # Remove comments
+            for comment_character in comment_characters:
+                line = line.split(comment_character)[0].rstrip()
             for old, new in to_replace.items():
                 line = line.replace(old, new)
             for x in line.split():
